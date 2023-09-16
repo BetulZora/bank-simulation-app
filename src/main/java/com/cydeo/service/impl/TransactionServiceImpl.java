@@ -3,10 +3,13 @@ package com.cydeo.service.impl;
 import com.cydeo.enums.AccountType;
 import com.cydeo.exceptions.BadRequestException;
 import com.cydeo.exceptions.AccountOwnershipException;
+import com.cydeo.exceptions.BalanceNotSufficientException;
 import com.cydeo.model.Account;
 import com.cydeo.model.Transaction;
 import com.cydeo.repository.AccountRepository;
+import com.cydeo.repository.TransactionRepository;
 import com.cydeo.service.TransactionService;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -18,11 +21,14 @@ import java.util.UUID;
 public class TransactionServiceImpl implements TransactionService {
 
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
-    public TransactionServiceImpl(AccountRepository accountRepository) {
+    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
+    @SneakyThrows
     @Override
     public Transaction makeTransfer(Account sender, Account receiver, BigDecimal amount, Date creationDate, String message) {
 
@@ -32,11 +38,35 @@ public class TransactionServiceImpl implements TransactionService {
         // if one account is saving and both must belong to the same user
             // the system allows transfer out of saving only to same user's checking
 
-        validateAccount(sender,receiver);
+        validateAccount(sender, receiver);
 
+        checkAccountOwnership(sender,receiver);
 
+        executeBalanceAndUpdateIfRequired(amount, sender, receiver);
 
+        // if transaction is complete, we need to create a Transaction Object and save it.
+
+        Transaction transaction = Transaction.builder().amount(amount).sender(sender.getId())
+                .receiver(receiver.getId()).createDate(creationDate).message(message).build();
         return null;
+    }
+
+
+    public void executeBalanceAndUpdateIfRequired(BigDecimal amount, Account sender, Account receiver) throws BalanceNotSufficientException {
+        if(checkSenderBalance(sender, amount)){
+            //update sender and receiver balance
+            sender.setBalance( sender.getBalance().subtract(amount));
+            receiver.setBalance(receiver.getBalance().add(amount));
+
+        }else {
+            throw new BalanceNotSufficientException("Balance is not enough for this transfer");
+        }
+    }
+
+    private boolean checkSenderBalance(Account sender, BigDecimal amount) {
+
+        return sender.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) >=0;
+
     }
 
     private void validateAccount(Account sender, Account receiver) {
@@ -50,10 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(sender.getId().equals( receiver.getId())){
             throw new BadRequestException("Sender and Receiver accounts need to be different");
         }
-        findAccountById(sender.getId());
-        findAccountById(receiver.getId());
 
-        checkAccountOwnership(sender,receiver);
 
 
 
@@ -65,18 +92,13 @@ public class TransactionServiceImpl implements TransactionService {
         // write an if statement that checks if one of the account is a saving account
         // user of sender or receiver is not the same throw AccountOwnershipException
 
-        if( sender.getAccountType() == AccountType.SAVING || receiver.getAccountType()==AccountType.SAVING && (!sender.getUserID().equals(receiver.getUserID()))){
+        if( (sender.getAccountType() == AccountType.SAVING || receiver.getAccountType()==AccountType.SAVING) && (!sender.getUserID().equals(receiver.getUserID()))){
 
-            throw new AccountOwnershipException("Cannot transfer from someone else's Saving account");
+            throw new AccountOwnershipException("Cannot transfer to or from someone else's Saving account");
 
         }else{
             // complete transaction
         }
-
-
-
-
-
     }
 
     private void findAccountById(UUID id) {
