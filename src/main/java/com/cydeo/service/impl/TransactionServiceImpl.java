@@ -4,12 +4,14 @@ import com.cydeo.enums.AccountType;
 import com.cydeo.exceptions.BadRequestException;
 import com.cydeo.exceptions.AccountOwnershipException;
 import com.cydeo.exceptions.BalanceNotSufficientException;
+import com.cydeo.exceptions.UnderConstructionException;
 import com.cydeo.model.Account;
 import com.cydeo.model.Transaction;
 import com.cydeo.repository.AccountRepository;
 import com.cydeo.repository.TransactionRepository;
 import com.cydeo.service.TransactionService;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -19,6 +21,11 @@ import java.util.UUID;
 
 @Component
 public class TransactionServiceImpl implements TransactionService {
+
+    @Value("${under_construction}")
+    private boolean underConstruction;
+    // Use the @Value annotation to get values from the properties file
+
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
@@ -32,23 +39,30 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Transaction makeTransfer(Account sender, Account receiver, BigDecimal amount, Date creationDate, String message) {
 
-        // do we have enough money for transaction
-        // is the target Account eligible for receiving?
-        // are we sending to the same account? This is not allowed
-        // if one account is saving and both must belong to the same user
+        //make transaction if app is not under construction
+        if(!underConstruction) {
+
+            // do we have enough money for transaction
+            // is the target Account eligible for receiving?
+            // are we sending to the same account? This is not allowed
+            // if one account is saving and both must belong to the same user
             // the system allows transfer out of saving only to same user's checking
 
-        validateAccount(sender, receiver);
+            validateAccount(sender, receiver);
 
-        checkAccountOwnership(sender,receiver);
+            checkAccountOwnership(sender, receiver);
 
-        executeBalanceAndUpdateIfRequired(amount, sender, receiver);
+            executeBalanceAndUpdateIfRequired(amount, sender, receiver);
 
-        // if transaction is complete, we need to create a Transaction Object and save it.
+            // if transaction is complete, we need to create a Transaction Object and save it.
 
-        Transaction transaction = Transaction.builder().amount(amount).sender(sender.getId())
-                .receiver(receiver.getId()).createDate(creationDate).message(message).build();
-        return null;
+            Transaction transaction = Transaction.builder().amount(amount).sender(sender.getId())
+                    .receiver(receiver.getId()).createDate(creationDate).message(message).build();
+            return transactionRepository.save(transaction);
+        }
+        else {
+            throw new UnderConstructionException("App is under construction. Please try again later");
+        }
     }
 
 
@@ -110,6 +124,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<Transaction> findAllTransaction() {
-        return null;
+
+        return transactionRepository.findAll();
     }
 }
