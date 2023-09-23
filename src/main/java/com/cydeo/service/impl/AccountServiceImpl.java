@@ -4,6 +4,7 @@ import com.cydeo.enums.AccountType;
 import com.cydeo.model.Account;
 import com.cydeo.repository.AccountRepository;
 import com.cydeo.service.AccountService;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
+@NoArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     AccountRepository accountRepository;
