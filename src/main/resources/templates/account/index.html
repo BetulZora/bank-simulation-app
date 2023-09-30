@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="utf-8">
@@ -16,11 +16,12 @@
 <div class="container my-5">
   <div class="row">
     <div class="col-md-6">
-      <div>
-        <h2>No Accounts yet!</h2>
+      <div th:if="${accountList.size() == 0}">
+        <h2 >No Accounts yet!</h2>
       </div>
-      <div>
+      <div th:unless="${accountList.size() == 0}" >
         <h2 class="my-5">Accounts</h2>
+
         <table class="table table-striped table-responsive-md">
           <thead>
           <tr>
@@ -34,19 +35,19 @@
           </tr>
           </thead>
           <tbody>
-          <tr >
-            <td></td>
-            <td></td>
-            <td></td>
-            <td ></td>
-            <td></td>
+          <tr th:each="acc : ${accountList}">
+            <td th:text="${acc.userID}"></td>
+            <td th:text="${acc.accountStatus}"></td>
+            <td th:text="${acc.balance}"></td>
+            <td th:text="${acc.accountType}"></td>
+            <td th:text="${acc.creationDate}"></td>
             <td><a class="btn btn-danger" href="#">Delete</a></td>
             <td><a class="btn btn-success" href="#">Account Transaction</a></td>
           </tr>
           </tbody>
         </table>
       </div>
-      <p class="my-5"><a href="#" class="btn btn-primary">Create Account<i class="fas fa-user-plus ml-2"></i></a></p>
+      <p class="my-5"><a th:href="@{create-form}" class="btn btn-primary">Create Account<i class="fas fa-user-plus ml-2"></i></a></p>
       <p class="my-5"><a href="#" class="btn btn-primary">Make Transfer<i class="fas fa-user-plus ml-2"></i></a></p>
     </div>
   </div>
