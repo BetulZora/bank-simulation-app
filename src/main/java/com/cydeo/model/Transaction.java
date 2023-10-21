@@ -11,6 +11,8 @@ import java.util.UUID;
 @Builder
 public class Transaction {
 
+    //TODO: complete validation as homework
+
     private UUID sender; // Aligning with Account
     private UUID receiver;
     private BigDecimal amount;
