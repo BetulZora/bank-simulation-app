@@ -140,4 +140,14 @@ public class TransactionServiceImpl implements TransactionService {
                 .limit(10)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Transaction> findTransactionListById(UUID id) {
+        /* // we should perform this action in the repository layer
+        return findAllTransaction().stream()
+                .filter(eachTransaction -> eachTransaction.getSender().equals(id) || eachTransaction.getReceiver().equals(id))
+                .collect(Collectors.toList());
+         */
+        return transactionRepository.findTransactionListByAccountID(id);
+    }
 }

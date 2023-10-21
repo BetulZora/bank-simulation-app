@@ -53,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findByID(UUID id) {
+    public Account retrieveByID(UUID id) {
         return accountRepository.findById(id);
     }
 }

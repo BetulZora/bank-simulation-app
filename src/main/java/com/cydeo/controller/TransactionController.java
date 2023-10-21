@@ -7,9 +7,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Controller
 public class TransactionController {
@@ -31,7 +33,7 @@ public class TransactionController {
         // need list of accounts for sender and receiver list of all accounts
         model.addAttribute("accounts", accountService.listAllAccounts());
         // to populate the table, populate with the last 10 transactions
-        // TODO: fill the table with the values in the last 10
+        // fill the table with the values in the last 10
         model.addAttribute("lastTenTransactions", transactionService.last10Transactions());
 
         return "transaction/make-transfer";
@@ -40,8 +42,8 @@ public class TransactionController {
     @PostMapping("/completeTransaction")
     public String completeTransaction(Transaction filledTransaction){
         transactionService.makeTransfer(
-                accountService.findByID(filledTransaction.getSender()),
-                accountService.findByID(filledTransaction.getReceiver()),
+                accountService.retrieveByID(filledTransaction.getSender()),
+                accountService.retrieveByID(filledTransaction.getReceiver()),
                 filledTransaction.getAmount(),
                 new Date(),
                 filledTransaction.getMessage()
@@ -49,6 +51,18 @@ public class TransactionController {
 
         return "redirect:/make-transfer";
 
+    }
+
+    // write a method that gets the account ID  from index.html and prints on the console
+
+    @GetMapping("/transaction/{id}")
+    public String transaction(@PathVariable("id") UUID id, Model model){
+        System.out.println("id = " + id);
+        // create the method that finds transactions by the id
+        // findTransactionListByID
+
+        model.addAttribute("transactions", transactionService.findTransactionListById(id));
+        return "transaction/transactions";
     }
 
 
