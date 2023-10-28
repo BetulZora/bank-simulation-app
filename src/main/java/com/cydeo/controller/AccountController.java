@@ -6,12 +6,14 @@ import com.cydeo.model.Account;
 import com.cydeo.service.AccountService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.time.LocalDate;
+
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.UUID;
 
@@ -46,7 +48,16 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public String saveCreatedAccount(@ModelAttribute("emptyaccount") Account filledAccount){
+    public String saveCreatedAccount(@Valid@ModelAttribute("emptyaccount") Account filledAccount,
+                                     BindingResult bindingResult,
+                                     Model model){
+        if(bindingResult.hasErrors()){
+            // provide information needed in the redirected page
+            // DO NOT provide a brand-new object
+            model.addAttribute("accountTypes", AccountType.values());
+            // redirect to the appropriate page
+            return "account/create-account";
+        }
         System.out.println("filledAccount = " + filledAccount);
         accountService.createNewAccount(filledAccount.getBalance(),new Date(),filledAccount.getAccountType(), filledAccount.getUserID());
         return "redirect:/index";

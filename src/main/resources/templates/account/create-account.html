@@ -21,6 +21,11 @@
                             <div class="form-group blu-margin">
                                 <label for="userId" class="col-form-label">UserId</label>
                                 <input th:field="*{userID}" type="text" class="form-control" id="userId" placeholder="user id">
+                                <span th:if="${#fields.hasErrors('userID')}">
+                                <ul class = "alert alert-danger">
+                                    <li th:each="err : ${#fields.errors('userID')}" th:text="${err}"></li>
+                                </ul>
+                                </span>
                             </div>
 
                             <div class="form-group blu-margin">
