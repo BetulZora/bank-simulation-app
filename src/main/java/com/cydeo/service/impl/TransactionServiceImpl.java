@@ -5,13 +5,12 @@ import com.cydeo.exceptions.BadRequestException;
 import com.cydeo.exceptions.AccountOwnershipException;
 import com.cydeo.exceptions.BalanceNotSufficientException;
 import com.cydeo.exceptions.UnderConstructionException;
-import com.cydeo.model.Account;
-import com.cydeo.model.Transaction;
+import com.cydeo.dto.AccountDTO;
+import com.cydeo.dto.TransactionDTO;
 import com.cydeo.repository.AccountRepository;
 import com.cydeo.repository.TransactionRepository;
 import com.cydeo.service.TransactionService;
 import lombok.SneakyThrows;
-import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @SneakyThrows
     @Override
-    public Transaction makeTransfer(Account sender, Account receiver, BigDecimal amount, Date creationDate, String message) {
+    public TransactionDTO makeTransfer(AccountDTO sender, AccountDTO receiver, BigDecimal amount, Date creationDate, String message) {
 
         //make transaction if app is not under construction
         if(!underConstruction) {
@@ -61,9 +60,9 @@ public class TransactionServiceImpl implements TransactionService {
 
             // if transaction is complete, we need to create a Transaction Object and save it.
 
-            Transaction transaction = Transaction.builder().amount(amount).sender(sender.getId())
+            TransactionDTO transactionDTO = TransactionDTO.builder().amount(amount).sender(sender.getId())
                     .receiver(receiver.getId()).createDate(creationDate).message(message).build();
-            return transactionRepository.save(transaction);
+            return transactionRepository.save(transactionDTO);
         }
         else {
             throw new UnderConstructionException("App is under construction. Please try again later");
@@ -71,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    public void executeBalanceAndUpdateIfRequired(BigDecimal amount, Account sender, Account receiver) throws BalanceNotSufficientException {
+    public void executeBalanceAndUpdateIfRequired(BigDecimal amount, AccountDTO sender, AccountDTO receiver) throws BalanceNotSufficientException {
         if(checkSenderBalance(sender, amount)){
             //update sender and receiver balance
             sender.setBalance( sender.getBalance().subtract(amount));
@@ -82,13 +81,13 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    private boolean checkSenderBalance(Account sender, BigDecimal amount) {
+    private boolean checkSenderBalance(AccountDTO sender, BigDecimal amount) {
 
         return sender.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) >=0;
 
     }
 
-    private void validateAccount(Account sender, Account receiver) {
+    private void validateAccount(AccountDTO sender, AccountDTO receiver) {
 
         // is the target Account eligible for receiving and the sender too?
 
@@ -106,7 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-    private void checkAccountOwnership(Account sender, Account receiver) {
+    private void checkAccountOwnership(AccountDTO sender, AccountDTO receiver) {
 
         // write an if statement that checks if one of the account is a saving account
         // user of sender or receiver is not the same throw AccountOwnershipException
@@ -128,21 +127,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> findAllTransaction() {
+    public List<TransactionDTO> findAllTransaction() {
 
         return transactionRepository.findAll();
     }
 
     @Override
-    public List<Transaction> last10Transactions() {
+    public List<TransactionDTO> last10Transactions() {
         return findAllTransaction().stream()
-                .sorted(Comparator.comparing(Transaction::getCreateDate).reversed())
+                .sorted(Comparator.comparing(TransactionDTO::getCreateDate).reversed())
                 .limit(10)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Transaction> findTransactionListById(UUID id) {
+    public List<TransactionDTO> findTransactionListById(UUID id) {
         /* // we should perform this action in the repository layer
         return findAllTransaction().stream()
                 .filter(eachTransaction -> eachTransaction.getSender().equals(id) || eachTransaction.getReceiver().equals(id))

@@ -1,12 +1,11 @@
 package com.cydeo.controller;
 
-import com.cydeo.model.Transaction;
+import com.cydeo.dto.TransactionDTO;
 import com.cydeo.service.AccountService;
 import com.cydeo.service.TransactionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -28,7 +27,7 @@ public class TransactionController {
     public String getMakeTransfer(Model model){
 
         // need an empty transaction object to populate
-        model.addAttribute("transaction", Transaction.builder().build());
+        model.addAttribute("transaction", TransactionDTO.builder().build());
         // user will set sender, receiver
         // need list of accounts for sender and receiver list of all accounts
         model.addAttribute("accounts", accountService.listAllAccounts());
@@ -40,13 +39,13 @@ public class TransactionController {
     }
 
     @PostMapping("/completeTransaction")
-    public String completeTransaction(Transaction filledTransaction){
+    public String completeTransaction(TransactionDTO filledTransactionDTO){
         transactionService.makeTransfer(
-                accountService.retrieveByID(filledTransaction.getSender()),
-                accountService.retrieveByID(filledTransaction.getReceiver()),
-                filledTransaction.getAmount(),
+                accountService.retrieveByID(filledTransactionDTO.getSender()),
+                accountService.retrieveByID(filledTransactionDTO.getReceiver()),
+                filledTransactionDTO.getAmount(),
                 new Date(),
-                filledTransaction.getMessage()
+                filledTransactionDTO.getMessage()
         );
 
         return "redirect:/make-transfer";

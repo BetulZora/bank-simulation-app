@@ -1,4 +1,4 @@
-package com.cydeo.model;
+package com.cydeo.dto;
 
 import com.cydeo.enums.AccountStatus;
 import com.cydeo.enums.AccountType;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class Account {
+public class AccountDTO {
 
     private UUID id;
     @NotNull

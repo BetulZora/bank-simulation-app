@@ -2,7 +2,7 @@ package com.cydeo.controller;
 
 
 import com.cydeo.enums.AccountType;
-import com.cydeo.model.Account;
+import com.cydeo.dto.AccountDTO;
 import com.cydeo.service.AccountService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,7 +40,7 @@ public class AccountController {
     @GetMapping("/create-form")
     public String createAccount(Model model){
         // provide an empty account object
-        model.addAttribute("emptyaccount", Account.builder().build());
+        model.addAttribute("emptyaccount", AccountDTO.builder().build());
         // provide an account type enum info to populate the dropdown\
         model.addAttribute("accountTypes", AccountType.values());
 
@@ -48,7 +48,7 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public String saveCreatedAccount(@Valid@ModelAttribute("emptyaccount") Account filledAccount,
+    public String saveCreatedAccount(@Valid@ModelAttribute("emptyaccount") AccountDTO filledAccountDTO,
                                      BindingResult bindingResult,
                                      Model model){
         if(bindingResult.hasErrors()){
@@ -58,8 +58,8 @@ public class AccountController {
             // redirect to the appropriate page
             return "account/create-account";
         }
-        System.out.println("filledAccount = " + filledAccount);
-        accountService.createNewAccount(filledAccount.getBalance(),new Date(),filledAccount.getAccountType(), filledAccount.getUserID());
+        System.out.println("filledAccount = " + filledAccountDTO);
+        accountService.createNewAccount(filledAccountDTO.getBalance(),new Date(), filledAccountDTO.getAccountType(), filledAccountDTO.getUserID());
         return "redirect:/index";
     }
 

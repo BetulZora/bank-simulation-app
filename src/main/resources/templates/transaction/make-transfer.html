@@ -14,14 +14,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <div>
-                        <form th:action="@{/completeTransaction}" method="post" th:object="${transaction}">
+                        <form th:action="@{/completeTransaction}" method="post" th:object="${transactionDTO}">
                             <div class="row">
                                 <div class="form-group blu-margin">
                                     <label for="sender" class="col-form-label">Sender</label>
                                     <select class="form-control" id="sender" th:field="*{sender}">
                                         <option value="0">Select Account</option>
-                                        <option th:each="account : ${accounts}" th:value="${account.id}"
-                                                th:text="${ account.balance +'-'+ account.userID + '-' + account.accountType.name()}"></option>
+                                        <option th:each="accountDTO : ${accounts}" th:value="${accountDTO.id}"
+                                                th:text="${ accountDTO.balance +'-'+ accountDTO.userID + '-' + accountDTO.accountType.name()}"></option>
                                     </select>
                                 </div>
         
@@ -29,8 +29,8 @@
                                     <label for="receiver" class="col-form-label">Receiver</label>
                                     <select class="form-control" id="receiver" th:field="*{receiver}">
                                         <option value="0">Select Account</option>
-                                        <option th:each="account : ${accounts}" th:value="${account.id}"
-                                                th:text="${ account.balance +'-'+ account.userID + '-' + account.accountType.name()}"></option>
+                                        <option th:each="accountDTO : ${accounts}" th:value="${accountDTO.id}"
+                                                th:text="${ accountDTO.balance +'-'+ accountDTO.userID + '-' + accountDTO.accountType.name()}"></option>
                                     </select>
                                 </div>
         

@@ -1,11 +1,10 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.AccountDTO;
 import com.cydeo.enums.AccountStatus;
 import com.cydeo.enums.AccountType;
-import com.cydeo.model.Account;
 import com.cydeo.repository.AccountRepository;
 import com.cydeo.service.AccountService;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,28 +22,28 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public Account createNewAccount(BigDecimal balance, Date createDate, AccountType accountType, Long userId) {
+    public AccountDTO createNewAccount(BigDecimal balance, Date createDate, AccountType accountType, Long userId) {
         // need to create the account,
         // Assign default AccountStatus as Active when account is created
-        Account account = Account.builder().id(UUID.randomUUID()).userID(userId)
+        AccountDTO accountDTO = AccountDTO.builder().id(UUID.randomUUID()).userID(userId)
                 .balance(balance).accountType(accountType).creationDate(createDate).accountStatus(AccountStatus.ACTIVE).build();
         // save it in the database (repository) and
         // then return it
 
-        return accountRepository.save(account);
+        return accountRepository.save(accountDTO);
     }
 
     @Override
-    public List<Account> listAllAccounts() {
+    public List<AccountDTO> listAllAccounts() {
         return accountRepository.findall();
     }
 
     @Override
     public void deleteByID(UUID id) {
         // find the account
-        Account accountToDelete = accountRepository.findById(id);
+        AccountDTO accountDTOToDelete = accountRepository.findById(id);
         // change the status to deleted
-        accountToDelete.setAccountStatus(AccountStatus.DELETED);
+        accountDTOToDelete.setAccountStatus(AccountStatus.DELETED);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account retrieveByID(UUID id) {
+    public AccountDTO retrieveByID(UUID id) {
         return accountRepository.findById(id);
     }
 }

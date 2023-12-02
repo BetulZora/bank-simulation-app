@@ -1,4 +1,4 @@
-package com.cydeo.model;
+package com.cydeo.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class Transaction {
+public class TransactionDTO {
 
     //TODO: complete validation as homework
 
