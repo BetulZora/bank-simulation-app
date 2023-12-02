@@ -25,10 +25,10 @@ public class BankSimulationAppApplication {
         TransactionService transactionService = container.getBean(TransactionService.class);
 
         // create sender and receiver account
-        AccountDTO sender = accountService.createNewAccount(BigDecimal.valueOf(70), new Date(), AccountType.CHECKING, 2L);
-        AccountDTO sender1 = accountService.createNewAccount(BigDecimal.valueOf(70), new Date(), AccountType.CHECKING, 1L);
-        AccountDTO receiver = accountService.createNewAccount(BigDecimal.valueOf(50), new Date(), AccountType.SAVING, 2L);
-        AccountDTO receiver2 = accountService.createNewAccount(BigDecimal.valueOf(50), new Date(), AccountType.CHECKING, 3L);
+      //  AccountDTO sender = accountService.createNewAccount(BigDecimal.valueOf(70), new Date(), AccountType.CHECKING, 2L);
+       // AccountDTO sender1 = accountService.createNewAccount(BigDecimal.valueOf(70), new Date(), AccountType.CHECKING, 1L);
+    //    AccountDTO receiver = accountService.createNewAccount(BigDecimal.valueOf(50), new Date(), AccountType.SAVING, 2L);
+     //   AccountDTO receiver2 = accountService.createNewAccount(BigDecimal.valueOf(50), new Date(), AccountType.CHECKING, 3L);
 
         /*
         accountService.listAllAccounts().forEach(System.out::println);
