@@ -6,7 +6,6 @@ import com.cydeo.dto.TransactionDTO;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public interface TransactionService {
 
@@ -15,7 +14,7 @@ public interface TransactionService {
     List<TransactionDTO> findAllTransaction();
 
     List<TransactionDTO> last10Transactions();
-    List<TransactionDTO> findTransactionListById(UUID id);
+    List<TransactionDTO> findTransactionListById(Long id);
 
 
 }

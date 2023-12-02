@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
@@ -46,12 +45,6 @@ public class TransactionServiceImpl implements TransactionService {
         //make transaction if app is not under construction
         if(!underConstruction) {
 
-            // do we have enough money for transaction
-            // is the target Account eligible for receiving?
-            // are we sending to the same account? This is not allowed
-            // if one account is saving and both must belong to the same user
-            // the system allows transfer out of saving only to same user's checking
-
             validateAccount(sender, receiver);
 
             checkAccountOwnership(sender, receiver);
@@ -60,8 +53,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             // if transaction is complete, we need to create a Transaction Object and save it.
 
-            TransactionDTO transactionDTO = TransactionDTO.builder().amount(amount).sender(sender.getId())
-                    .receiver(receiver.getId()).createDate(creationDate).message(message).build();
+            TransactionDTO transactionDTO = new TransactionDTO() ;
             return transactionRepository.save(transactionDTO);
         }
         else {
@@ -99,10 +91,6 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BadRequestException("Sender and Receiver accounts need to be different");
         }
 
-
-
-
-
     }
 
     private void checkAccountOwnership(AccountDTO sender, AccountDTO receiver) {
@@ -119,7 +107,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    private void findAccountById(UUID id) {
+    private void findAccountById(Long id) {
 
         accountRepository.findById(id);
 
@@ -141,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDTO> findTransactionListById(UUID id) {
+    public List<TransactionDTO> findTransactionListById(Long id) {
         /* // we should perform this action in the repository layer
         return findAllTransaction().stream()
                 .filter(eachTransaction -> eachTransaction.getSender().equals(id) || eachTransaction.getReceiver().equals(id))
