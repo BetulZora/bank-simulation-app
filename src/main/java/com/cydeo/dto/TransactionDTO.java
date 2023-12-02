@@ -1,21 +1,30 @@
 package com.cydeo.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.UUID;
 
-@Data
-@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TransactionDTO {
 
-    //TODO: complete validation as homework
-
-    private UUID sender; // Aligning with Account
-    private UUID receiver;
+    //@NotNull
+    private AccountDTO sender; // Aligning with Account
+    //@NotNull
+    private AccountDTO receiver;
+    @Positive
+    @NotNull
     private BigDecimal amount;
+    @NotNull
+    @Size(min = 2,max = 250)
+    @Pattern(regexp = "^[a-zA-Z0-9]*$")
     private String message;
     private Date createDate;
 
