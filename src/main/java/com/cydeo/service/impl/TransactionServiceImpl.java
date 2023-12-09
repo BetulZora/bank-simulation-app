@@ -7,8 +7,10 @@ import com.cydeo.exceptions.BalanceNotSufficientException;
 import com.cydeo.exceptions.UnderConstructionException;
 import com.cydeo.dto.AccountDTO;
 import com.cydeo.dto.TransactionDTO;
+import com.cydeo.mapper.TransactionMapper;
 import com.cydeo.repository.AccountRepository;
 import com.cydeo.repository.TransactionRepository;
+import com.cydeo.service.AccountService;
 import com.cydeo.service.TransactionService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Comparator.comparing;
 
 @Component
 public class TransactionServiceImpl implements TransactionService {
@@ -30,11 +31,15 @@ public class TransactionServiceImpl implements TransactionService {
     // Use the @Value annotation to get values from the properties file
 
 
-    private final AccountRepository accountRepository;
+    // best practice to work with Service layers
+    //private final AccountRepository accountRepository;
+    private final AccountService accountService;
+    private final TransactionMapper transactionMapper;
     private final TransactionRepository transactionRepository;
 
-    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository) {
-        this.accountRepository = accountRepository;
+    public TransactionServiceImpl(AccountService accountService, TransactionMapper transactionMapper, TransactionRepository transactionRepository) {
+        this.accountService = accountService;
+        this.transactionMapper = transactionMapper;
         this.transactionRepository = transactionRepository;
     }
 
@@ -117,24 +122,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionDTO> findAllTransaction() {
 
-        return transactionRepository.findAll();
+        return transactionRepository.findAll().stream().map(transactionMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<TransactionDTO> last10Transactions() {
-        return findAllTransaction().stream()
-                .sorted(Comparator.comparing(TransactionDTO::getCreateDate).reversed())
-                .limit(10)
-                .collect(Collectors.toList());
+        return transactionRepository.findLast10Transactions().stream().map(transactionMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<TransactionDTO> findTransactionListById(Long id) {
-        /* // we should perform this action in the repository layer
-        return findAllTransaction().stream()
-                .filter(eachTransaction -> eachTransaction.getSender().equals(id) || eachTransaction.getReceiver().equals(id))
-                .collect(Collectors.toList());
-         */
-        return transactionRepository.findTransactionListByAccountID(id);
+        return transactionRepository.findListById(id).stream().map(transactionMapper::convertToDTO).collect(Collectors.toList());
     }
 }
