@@ -29,7 +29,7 @@ public class TransactionController {
         model.addAttribute("transaction", new TransactionDTO());
         // user will set sender, receiver
         // need list of accounts for sender and receiver list of all accounts
-        model.addAttribute("accounts", accountService.listAllAccounts());
+        model.addAttribute("accounts", accountService.listAllActiveAccounts());
         // to populate the table, populate with the last 10 transactions
         // fill the table with the values in the last 10
         model.addAttribute("lastTenTransactions", transactionService.last10Transactions());

@@ -19,8 +19,5 @@ public interface AccountService {
 
     AccountDTO retrieveByID(Long id);
 
-
-
-
-
+    List<AccountDTO> listAllActiveAccounts();
 }
