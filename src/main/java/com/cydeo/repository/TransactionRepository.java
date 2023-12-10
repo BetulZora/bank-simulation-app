@@ -14,7 +14,7 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     // derived queries order first then limit
-    @Query("select t from Transaction t order by t.createDate desc limit 10")
+    @Query(value = "SELECT * FROM transactions ORDER BY create_date DESC LIMIT 10",nativeQuery = true)
     List<Transaction> findLast10Transactions();
 
     @Query("select t from Transaction t where t.receiver.id = ?1 or t.sender.id =?1 order by t.createDate desc ")

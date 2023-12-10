@@ -1,6 +1,7 @@
 package com.cydeo.service;
 
 import com.cydeo.dto.AccountDTO;
+import com.cydeo.entity.Account;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface AccountService {
     AccountDTO retrieveByID(Long id);
 
     List<AccountDTO> listAllActiveAccounts();
+
+    void updateAccount(AccountDTO dto);
 }

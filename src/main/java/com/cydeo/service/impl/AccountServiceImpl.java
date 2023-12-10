@@ -9,8 +9,6 @@ import com.cydeo.repository.AccountRepository;
 import com.cydeo.service.AccountService;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.AccountNotFoundException;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,5 +66,10 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findAllByAccountStatus(AccountStatus.ACTIVE)
                 .stream().map(accountMapper::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateAccount(AccountDTO dto) {
+        accountRepository.save(accountMapper.convertToEntity(dto));
     }
 }

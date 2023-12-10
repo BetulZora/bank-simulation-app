@@ -8,7 +8,6 @@ import com.cydeo.exceptions.UnderConstructionException;
 import com.cydeo.dto.AccountDTO;
 import com.cydeo.dto.TransactionDTO;
 import com.cydeo.mapper.TransactionMapper;
-import com.cydeo.repository.AccountRepository;
 import com.cydeo.repository.TransactionRepository;
 import com.cydeo.service.AccountService;
 import com.cydeo.service.TransactionService;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,8 +56,10 @@ public class TransactionServiceImpl implements TransactionService {
 
             // if transaction is complete, we need to create a Transaction Object and save it.
 
-            TransactionDTO transactionDTO = new TransactionDTO() ;
-            return transactionRepository.save(transactionDTO);
+            TransactionDTO transactionDTO = new TransactionDTO(sender,receiver,amount,message,creationDate);
+            //save into the db and return it
+            transactionRepository.save(transactionMapper.convertToEntity(transactionDTO));
+            return transactionDTO;
         }
         else {
             throw new UnderConstructionException("App is under construction. Please try again later");
@@ -69,9 +69,22 @@ public class TransactionServiceImpl implements TransactionService {
 
     public void executeBalanceAndUpdateIfRequired(BigDecimal amount, AccountDTO sender, AccountDTO receiver) throws BalanceNotSufficientException {
         if(checkSenderBalance(sender, amount)){
+            // get sender and receiver from the DB
             //update sender and receiver balance
             sender.setBalance( sender.getBalance().subtract(amount));
             receiver.setBalance(receiver.getBalance().add(amount));
+
+            // to secure against null fields find the accounts separate
+            AccountDTO senderAcc = accountService.retrieveByID(sender.getId());
+            AccountDTO receiverAcc = accountService.retrieveByID(receiver.getId());
+
+            // change only the balance field
+            senderAcc.setBalance(sender.getBalance());
+            receiverAcc.setBalance(receiver.getBalance());
+
+            // save the account now
+            accountService.updateAccount(senderAcc);
+            accountService.updateAccount(receiverAcc);
 
         }else {
             throw new BalanceNotSufficientException("Balance is not enough for this transfer");
@@ -114,7 +127,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private void findAccountById(Long id) {
 
-        accountRepository.findById(id);
+        accountService.retrieveByID(id);
 
 
     }
